@@ -1,0 +1,53 @@
+# Define all Docker services - PLATAFORMA LEGAL
+services:
+
+  # MySQL Service Configuration - Plataforma Legal
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db-wallet
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fintech-db      
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Adminer Service Configuration - Plataforma Legal
+  # LOGIN NO WEBSERVICE ADMINER LOCAL
+  # System: MySQL/MariaDB
+  # Server: mysql
+  # username: root
+  # password: root
+  # database: ecommerce
+  adminer:
+    image: adminer:5.2.1
+    container_name: adminer-walltet
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      - mysql
+
+  # REDIS SERVICE CONFIGURATION
+  #redis:
+   #image: redis:7.0
+   #container_name: service_redis
+   #restart: always
+   #ports:
+     #- "6379:6379"
+   #command: ["redis-server", "--appendonly", "yes"]
+   #volumes:
+     #- redis_data:/data    
+
+
+volumes:
+  mysql_data:
