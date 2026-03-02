@@ -2,6 +2,7 @@ package com.example.fintech.service;
 
 import com.example.fintech.controller.AuthController;
 import com.example.fintech.entity.User;
+import com.example.fintech.exception.ResourceNotFoundException;
 import com.example.fintech.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setConfirmedAccount(false);
+        user.setConfirmedAccount(true);
         user.setConfirmationCode(generateConfirmationCode(user.getEmail()));
 
         // Send an email with the confirmation code in order to confirm email
@@ -45,6 +46,13 @@ public class UserService {
 
         logger.info("UserService | METHOD: registerUser() ABOUT TO SAVE USER: {}", user.toString());
         return userRepository.save(user);
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found")
+                );
     }
 
 
@@ -60,6 +68,21 @@ public class UserService {
         int code = 100000 + random.nextInt(900000);
         logger.info("UserService | METHOD: generateConfirmationCode() CODE GENERATED: {}", code);
         return String.valueOf(code);
+    }
+
+
+
+    // MELHORAR PARTE DA CONFIRMACAO
+    public void confirmUser(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        if (!user.getConfirmationCode().equals(code)) {
+            throw new IllegalStateException("Invalid confirmation code");
+        }
+
+        user.setConfirmedAccount(true);
+        userRepository.save(user);
     }
 
 }

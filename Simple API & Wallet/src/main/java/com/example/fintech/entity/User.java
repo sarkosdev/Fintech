@@ -1,9 +1,11 @@
 package com.example.fintech.entity;
 
+import com.example.fintech.service.UserService;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -46,5 +48,6 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Account account;
+
 
 }
