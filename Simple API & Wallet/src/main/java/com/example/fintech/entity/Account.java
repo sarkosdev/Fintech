@@ -1,5 +1,6 @@
 package com.example.fintech.entity;
 
+import com.example.fintech.exception.BusinessException;
 import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -41,7 +42,7 @@ public class Account {
      */
     public void withdraw(BigDecimal amount) {
         if (this.balance.compareTo(amount) < 0) {
-            throw new RuntimeException("Not enough balance in this account " + this.id);
+            throw new BusinessException("Not enough balance in this account " + this.id);
         }
         this.balance = this.balance.subtract(amount);
     }

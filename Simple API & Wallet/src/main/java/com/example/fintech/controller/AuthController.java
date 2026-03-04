@@ -1,5 +1,6 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.ConfirmationCodeDTO;
 import com.example.fintech.dto.LoginRequestDTO;
 import com.example.fintech.entity.User;
 import com.example.fintech.security.CustomUserDetailsService;
@@ -11,8 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +53,6 @@ public class AuthController {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );
-        //final UserDetails userDetails = (UserDetails) userService.getUserByEmail(loginRequest.getEmail());
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getEmail());
         final String jwt = jwtService.generateToken(userDetails);
 
@@ -62,13 +60,29 @@ public class AuthController {
     }
 
 
+    /**
+     * Check user confirmationCode Endpoint
+     * introduce in 'userName' your account username and you will be able to check your confirmation code
+     * @param userName
+     * @return ResponseEntity<ConfirmationCodeDTO>
+     */
+    @GetMapping("/check-code/{userName}")
+    public ResponseEntity<ConfirmationCodeDTO> checkCode(@PathVariable("userName") String userName) {
+        logger.info("AuthController | METHOD: checkCode() - CHECK USER CONFIRMATION CODE OPERATION");
+        return ResponseEntity.ok(userService.checkUserCode(userName));
+    }
 
-    // MELHORAR PARTE DA CONFIRMACAO
-    // deve ser feito endpoint para cada email confirmar o codigo
-    // deve ser feito endpoint com base no email para confirmar o codigo
-    @PostMapping("/confirm")
-    public ResponseEntity<String> confirm(@RequestParam String email, @RequestParam String code) {
-        userService.confirmUser(email, code);
+
+    /**
+     * Confirmation code User Endpoint
+     * @param userName
+     * @param code
+     * @return String
+     */
+    @PostMapping("/confirm-code/{userName}")
+    public ResponseEntity<String> confirmCode(@PathVariable("userName") String userName, @RequestParam String code) {
+        logger.info("AuthController | METHOD: confirmCode() - USER CONFIRMATION CODE INPUT OPERATION");
+        userService.confirmUser(userName, code);
         return ResponseEntity.ok("Account confirmed");
     }
 

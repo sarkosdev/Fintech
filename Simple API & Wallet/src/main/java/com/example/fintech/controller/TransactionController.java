@@ -1,7 +1,5 @@
 package com.example.fintech.controller;
 
-import com.example.fintech.entity.Account;
-import com.example.fintech.entity.Transaction;
 import com.example.fintech.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +31,7 @@ public class TransactionController {
             @RequestParam Long receiverId,
             @RequestParam BigDecimal amount
             ){
-        logger.info("TransactionController | METHOD: sendMoneyToAccount() - SEND MONEY FROM ACCOUNT {} TO ACCOUNT {}", senderId, receiverId);
+        logger.info("TransactionController | METHOD: sendMoneyToAccount() - SEND MONEY FROM USER ACCOUNT {} TO USER ACCOUNT {}", senderId, receiverId);
         transactionService.transfer(senderId, receiverId, amount);
         return ResponseEntity.ok("Transaction completed with success");
     }

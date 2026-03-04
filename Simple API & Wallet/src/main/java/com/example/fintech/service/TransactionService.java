@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+/**
+ * Transaction Service Class
+ */
 @Service
 @RequiredArgsConstructor    // Creates constructor for dependency injection
 public class TransactionService {
@@ -19,47 +22,46 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
 
     /**
-     * O @Transactional cria uma "unidade de trabalho".
-     * Se QUALQUER RuntimeException acontecer aqui dentro,
-     * o banco de dados volta ao estado anterior (Rollback).
+     * Transfer money between accounts operation
+     *
+     * @Transactional creates a  work unity
+     * If any RuntimeException occurs in here database performs a
+     * Rollback returning to the previous state
      */
     @Transactional
     public Transaction transfer(Long senderId, Long receiverId, BigDecimal amount) {
 
-        // 1. Validar se não é a mesma conta
+        // Check if its a different account
         if (senderId.equals(receiverId)) {
-            throw new RuntimeException("Não é possível transferir para a própria conta.");
+            throw new RuntimeException("You cannot transfer money to your own account");
         }
 
-        // 2. Buscar as contas (Usamos findById para garantir que temos o saldo atualizado)
+        // Check if sender account exists in database according to account id
         Account sender = accountRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("Conta de origem não encontrada"));
+                .orElseThrow(() -> new BusinessException("Sender account not found"));
 
+        // Check if receiver account exists in database according to account id
         Account receiver = accountRepository.findById(receiverId)
-                .orElseThrow(() -> new RuntimeException("Conta de destino não encontrada"));
+                .orElseThrow(() -> new BusinessException("Receiver account not found"));
 
-        // Verifica se quem envia tem dinheiro suficiente, caso nao tenha, dispara excepcao
-        if(sender.getBalance().compareTo(amount) < 0) {
-            throw new BusinessException("Saldo insuficiente para completar a transferência.");
-        }
 
-        // 3. Executar a lógica de negócio (Débito e Crédito)
+        // Business Logic
+        // 1. withdraw from sender account
         sender.withdraw(amount);
+        // 2. deposit in to receiver account
         receiver.deposit(amount);
 
-        // 4. Salvar as alterações de saldo
+        // Save both changes in database
         accountRepository.save(sender);
         accountRepository.save(receiver);
 
-        // 5. Registrar o histórico da transação
+        // Saves transaction operation in database
         Transaction tx = new Transaction();
         tx.setSenderAccount(sender);
         tx.setReceiverAccount(receiver);
         tx.setBalance(amount);
 
         return transactionRepository.save(tx);
-
-        // Se o código chegar aqui com sucesso, o Spring faz o "Commit" no banco.
     }
 
 

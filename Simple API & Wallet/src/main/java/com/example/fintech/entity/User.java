@@ -1,11 +1,9 @@
 package com.example.fintech.entity;
 
-import com.example.fintech.service.UserService;
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -39,7 +37,6 @@ public class User {
     @Column( name = "password", nullable = false)
     private String password;
 
-    @NotBlank
     @Column(name = "confirmation_code", nullable = false)
     private String confirmationCode;
 

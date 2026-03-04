@@ -1,16 +1,19 @@
 package com.example.fintech.service;
 
+import com.example.fintech.config.kafka.producer.RequestEventProducer;
 import com.example.fintech.controller.AuthController;
+import com.example.fintech.dto.ConfirmationCodeDTO;
+import com.example.fintech.dto.RequestEvent;
 import com.example.fintech.entity.User;
-import com.example.fintech.exception.ResourceNotFoundException;
+import com.example.fintech.exception.BusinessException;
 import com.example.fintech.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Random;
 
 /**
@@ -23,7 +26,7 @@ public class UserService {
     private final static Logger logger = LogManager.getLogger(AuthController.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;                                          //Encodes password
-
+    private final RequestEventProducer requestEventProducer;
 
     /**
      * Register User
@@ -33,56 +36,90 @@ public class UserService {
     public User registerUser(User user) {
         logger.info("UserService | METHOD: registerUser() - REGISTER A NEW USER: {}", user.toString());
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new IllegalStateException("Email already taken");
+            throw new BusinessException("Email already taken");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setConfirmedAccount(true);
+        user.setConfirmedAccount(false);
         user.setConfirmationCode(generateConfirmationCode(user.getEmail()));
-
-        // Send an email with the confirmation code in order to confirm email
-        logger.info("UserService | METHOD: registerUser() ABOUT TO SEND EMAIL WITH CONFIRMATION CODE");
-        //emailService.sendEmailConfirmationMethod(user);
 
         logger.info("UserService | METHOD: registerUser() ABOUT TO SAVE USER: {}", user.toString());
         return userRepository.save(user);
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("User not found")
-                );
+    /**
+     * Checks if user exists on DB, checks if code provided matches the code
+     * associated to our User
+     * @param email
+     * @param code
+     * @return User
+     */
+    public void confirmUser(String email, String code) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalStateException("User not found"));
+
+        if(user.isConfirmedAccount()) throw new BusinessException("This account is already confirmed");
+
+        if (!user.getConfirmationCode().equals(code)) throw new BusinessException("Invalid confirmation code");
+
+        user.setConfirmedAccount(true);
+
+        try {
+            userRepository.save(user);
+
+            // If it saved successfully send RequestEvent for our Kafka Topic (Message Driven Design)
+            // In order to create an Account for this User
+            sendToKafkaProducer(user);
+        }
+        catch (Exception e) {
+            logger.error("Error during confirmUser OPERATION", e);
+            throw new RuntimeException("Failed Operation");
+        }
+    }
+
+    /**
+     * Finds user confirmationCode in DB by Email in order to check
+     * confirmationCode for User
+     * @param email
+     * @return ConfirmationCodeDTO
+     */
+    public ConfirmationCodeDTO checkUserCode(String email){
+        return userRepository.findConfirmationCodeByEmail(email)
+                .orElseThrow(() -> new BusinessException("User not found"));
     }
 
 
 
+
     //-----------PRIVATE OPERATIONS SECTIONS-----------------------//
+
     /**
      * Generates 6 digits code in order to be used for email confirmation
      * @return String
      */
     private String generateConfirmationCode(String email){
-        logger.info("UserService | METHOD: generateConfirmationCode() GENERATE CONFIRMATION CODE for email: {}", email);
+        logger.info("UserService | METHOD: generateConfirmationCode() GENERATE CONFIRMATION CODE for email: {}"
+                , email);
+
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
         logger.info("UserService | METHOD: generateConfirmationCode() CODE GENERATED: {}", code);
         return String.valueOf(code);
     }
 
+    /**
+     * Calls our Kafka topic in order to send RequestEvent from Producer to Consumer
+     */
+    private void sendToKafkaProducer(User user){
 
+        RequestEvent requestEvent = new RequestEvent();
+        requestEvent.setUserEmail(user.getEmail());
+        requestEvent.setGiveAwayFreeAmount(new BigDecimal(100));
 
-    // MELHORAR PARTE DA CONFIRMACAO
-    public void confirmUser(String email, String code) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+        logger.info("UserService | METHOD: sendToKafkaProducer() ABOUT TO SEND MESSAGE with payload: {}"
+                , requestEvent.toString());
 
-        if (!user.getConfirmationCode().equals(code)) {
-            throw new IllegalStateException("Invalid confirmation code");
-        }
-
-        user.setConfirmedAccount(true);
-        userRepository.save(user);
+        requestEventProducer.send(requestEvent);
     }
 
 }

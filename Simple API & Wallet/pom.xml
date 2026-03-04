@@ -60,15 +60,8 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<!--<version>8.0.0.Final</version>-->
 		</dependency>
 
-		<!--KAFKA DEPENDENCIE
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
-		-->
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -111,12 +104,12 @@
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
 
-		<!-- EMAIL CONFIG
+
+		<!--KAFKA DEPENDENCIES -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
-		-->
 
 		<!-- JWT -->
 		<dependency>

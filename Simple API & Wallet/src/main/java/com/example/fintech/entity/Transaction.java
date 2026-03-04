@@ -2,6 +2,7 @@ package com.example.fintech.entity;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -28,16 +29,17 @@ public class Transaction {
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
+    @Getter
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime timestamp;
 
-    // Relacionamento com a conta de origem
+    //Relation with sender account
     @NotNull(message = "Field 'senderAccountId' cannot be empty")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     private Account senderAccount;
 
-    // Relacionamento com a conta de destino
+    //Relation with receiver account
     @NotNull(message = "Field 'receiverAccountId' cannot be empty")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", nullable = false)
