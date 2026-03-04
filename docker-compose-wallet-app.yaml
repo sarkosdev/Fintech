@@ -38,15 +38,15 @@ services:
       - mysql
 
   # REDIS SERVICE CONFIGURATION
-  #redis:
-   #image: redis:7.0
-   #container_name: service_redis
-   #restart: always
-   #ports:
-     #- "6379:6379"
-   #command: ["redis-server", "--appendonly", "yes"]
-   #volumes:
-     #- redis_data:/data    
+  redis:
+   image: redis:7.0
+   container_name: redis-walltet
+   restart: always
+   ports:
+    - "6379:6379"
+   command: ["redis-server", "--appendonly", "yes"]
+   volumes:
+    - redis_data:/data    
 
 # KAFKA SERVICE CONFIGURATION
   zookeeper:
@@ -98,3 +98,4 @@ services:
 
 volumes:
   mysql_data:
+  redis_data:

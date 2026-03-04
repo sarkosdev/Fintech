@@ -2,6 +2,8 @@ package com.example.fintech.controller;
 
 import com.example.fintech.dto.ErrorResponse;
 import com.example.fintech.exception.BusinessException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +22,9 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final static Logger logger = LogManager.getLogger(GlobalExceptionHandler.class);
+
 
     /**
      * Handles BusinessException exceptions, which are thrown when a business rule
@@ -75,6 +80,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+
+        logger.error("Unexpected error occurred", ex);
+
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 "Unexpected server error",
