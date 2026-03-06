@@ -71,8 +71,6 @@ public class RedisConfig {
 
         template.setConnectionFactory(redisConnectionFactory);
 
-        //template.getConnectionFactory().getConnection().flushDb();
-
         // Configure the RedisTemplate to use a custom serializer
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

@@ -19,5 +19,4 @@ public class TransactionDTO implements Serializable {
     private Long receiverId;
     private String operationType;
 
-
 }
