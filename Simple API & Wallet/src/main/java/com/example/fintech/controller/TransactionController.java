@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Transaction Controller class
@@ -28,34 +29,33 @@ public class TransactionController {
     /**
      * Send Money from one account to another by Account id
      * @param userDetails
-     * @param senderId
      * @param receiverId
      * @param amount
      * @return ResponseEntity<String>
      */
     @PostMapping("/withdraw")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> sendMoneyToAccount(
+    public ResponseEntity<Map<String, String>> sendMoneyToAccount(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam Long senderId,
             @RequestParam Long receiverId,
             @RequestParam BigDecimal amount
             ){
-        logger.info("TransactionController | METHOD: sendMoneyToAccount() - SEND MONEY FROM USER ACCOUNT {} TO USER ACCOUNT {}", senderId, receiverId);
-        transactionService.transfer(senderId, receiverId, amount);
-        return ResponseEntity.ok("Transaction completed with success");
+        logger.info("TransactionController | METHOD: sendMoneyToAccount() - SEND MONEY FROM USER ACCOUNT {} TO USER ACCOUNT {}", userDetails.getUsername(), receiverId);
+        transactionService.transfer(userDetails.getUsername(), receiverId, amount);
+        return ResponseEntity.ok(Map.of("msg", "Transaction completed with success"));
     }
 
-
-    @GetMapping("/getAllTransactions/{accountId}")
+    /**
+     * Get Transaction History by User email
+     * @param userDetails
+     * @return List<TransactionDTO>
+     */
+    @GetMapping("/wallet-transactions-history")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<TransactionDTO>> getAllTransactions(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Long accountId) {
-        logger.info("TransactionController | METHOD: getAllTransactions() - GET ALL USER ACCOUNT TRANSACTIONS {}", accountId);
-        return ResponseEntity.ok(transactionService.getAllTransactionsByAccount(accountId));
+            @AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("TransactionController | METHOD: getAllTransactions() - GET ALL USER ACCOUNT TRANSACTIONS {}", userDetails.getUsername());
+        return ResponseEntity.ok(transactionService.findAllTransactionsByUserEmail(userDetails.getUsername()));
     }
-
-
 
 }

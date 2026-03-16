@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.Random;
 
@@ -33,8 +34,9 @@ public class UserService {
      * @param user
      * @return
      */
+    @Transactional
     public User registerUser(User user) {
-        logger.info("UserService | METHOD: registerUser() - REGISTER A NEW USER: {}", user.toString());
+        logger.info("UserService | METHOD: registerUser() - REGISTER A NEW USER: {}", user.getEmail());
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new BusinessException("Email already taken");
         }

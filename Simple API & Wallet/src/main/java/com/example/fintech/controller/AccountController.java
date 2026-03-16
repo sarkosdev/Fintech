@@ -1,5 +1,6 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.WalletDTO;
 import com.example.fintech.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -8,12 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Account Controller class
@@ -35,12 +35,38 @@ public class AccountController {
      */
     @PostMapping("/deposit")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> depositMoney(@AuthenticationPrincipal UserDetails userDetails, @RequestParam BigDecimal amount) {
+    public ResponseEntity<Map<String, String>> depositMoney(@AuthenticationPrincipal UserDetails userDetails, @RequestParam BigDecimal amount) {
         logger.info("TransactionController | METHOD: depositMoney() - DEPOSIT MONEY IN OWN ACCOUNT OPERATION");
 
         accountService.depositMoney(userDetails.getUsername(), amount);
 
-        return ResponseEntity.ok("Deposit completed with success with amount: " + amount.toString());
+        return ResponseEntity.ok(Map.of("response", "Deposit completed with success with amount: " + amount.toString()));
+    }
+
+    /**
+     * Get Account current balance
+     * @param userDetails
+     * @return
+     */
+    @GetMapping("/balance")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, BigDecimal>> currentBalance(@AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("TransactionController | METHOD: currentBalance() - GET CURRENT WALLET BALANCE");
+
+        return ResponseEntity.ok(Map.of("balance", accountService.currentBalance(userDetails.getUsername())));
+
+    }
+
+    /**
+     * Get all Accounts available on the system
+     * @param userDetails
+     * @return
+     */
+    @GetMapping("/get-all-accounts-system")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<WalletDTO>> getAllAccountsByEmail(@AuthenticationPrincipal UserDetails userDetails){
+        logger.info("TransactionController | METHOD: getAllAccountsByEmail() - GET ALL WALLETS AVAILABLE TO TRANSFER MONEY");
+        return ResponseEntity.ok(accountService.getAllAccountsByEmail(userDetails.getUsername()));
     }
 
 

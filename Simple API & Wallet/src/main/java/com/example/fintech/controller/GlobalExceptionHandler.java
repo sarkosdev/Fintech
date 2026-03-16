@@ -1,11 +1,16 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.ApiResponseWrapper;
 import com.example.fintech.dto.ErrorResponse;
 import com.example.fintech.exception.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,13 +39,13 @@ public class GlobalExceptionHandler {
      * @return A ResponseEntity containing the ErrorResponse object and HTTP status 400 (Bad Request).
      */
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                HttpStatus.BAD_REQUEST.value()
-        );
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ApiResponseWrapper> handleBusinessException(BusinessException ex) {
+
+        logger.error("Unexpected error occurred 3", ex);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseWrapper.error(ex.getMessage()));
     }
 
     /**
@@ -53,8 +58,10 @@ public class GlobalExceptionHandler {
      * @return Structured error response with HTTP status 400.
      */
     @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<ApiResponseWrapper> handleValidationException(
             org.springframework.web.bind.MethodArgumentNotValidException ex) {
+
+        logger.error("Unexpected error occurred 2", ex);
 
         Map<String, String> errors = new HashMap<>();
 
@@ -62,15 +69,29 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         });
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                "Validation failed",
-                HttpStatus.BAD_REQUEST.value(),
-                errors
-        );
+        String message = "Validation failed: " + errors;
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponseWrapper.error(message));
     }
+
+    /**
+     * Bad Credentials handler in case user input wrong credentials
+     * This act as a way to show user that the credentials are wrong and there was a problem trying to login
+     * @param ex
+     * @return ApiResponseWrapper
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiResponseWrapper> handleBadCredentials(BadCredentialsException ex) {
+
+        logger.warn("Authentication failed: {}", ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponseWrapper.error("Invalid email or password"));
+    }
+
 
     /**
      * Generic handler for any other unexpected exceptions (RuntimeExceptions, etc.).
@@ -79,17 +100,13 @@ public class GlobalExceptionHandler {
      * stack trace, which could represent a security risk (Information Exposure).
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+    public ResponseEntity<ApiResponseWrapper> handleGeneralException(Exception ex) {
 
-        logger.error("Unexpected error occurred", ex);
+        logger.error("Unexpected error occurred 1: " + ex.getMessage());
 
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
-                "Unexpected server error",
-                HttpStatus.INTERNAL_SERVER_ERROR.value()
-        );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponseWrapper.error(ex.getMessage()));
     }
-
 
 }

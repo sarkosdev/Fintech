@@ -1,0 +1,56 @@
+<div class="deposit-container">
+
+    <!-- MESSSAGE SECTION COMPONENT-->
+    <p-toast position="top-right"></p-toast>
+
+
+  <div class="card">
+
+
+
+    <!-- BALANCE -->
+    <div class="balance-section">
+      <span class="balance-label">Current Balance</span>
+      <div class="balance-value">
+        {{ accountBalance | currency:'EUR' }}
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="depositForm" (ngSubmit)="submit()" class="deposit-form">
+
+      <h2>Deposit Money</h2>
+
+      <div class="field">
+        <label for="amount">Deposit Amount</label>
+
+        <p-inputnumber
+          formControlName="amount"
+          mode="currency"
+          currency="EUR"
+          locale="de-DE"
+          inputId="amount">
+        </p-inputnumber>
+
+        <small class="error" *ngIf="isInvalid('amount')">
+          Enter a valid amount
+        </small>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Deposit"
+        icon="pi pi-check"
+        class="deposit-button"
+        [disabled]="depositForm.invalid">
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+

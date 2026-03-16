@@ -38,56 +38,58 @@ public class TransactionService {
      * so our cache list must be deleted from Redis DB
      */
     @Caching(evict = {
-            @CacheEvict(value = "TransactionList", allEntries = true)
+            @CacheEvict(value = "TransactionList", allEntries = true),
+            @CacheEvict(value = "AccountTransactions", allEntries = true)
             })
     @Transactional
-    public Transaction transfer(Long senderId, Long receiverId, BigDecimal amount) {
-
-        // Check if its a different account
-        if (senderId.equals(receiverId)) {
-            throw new RuntimeException("You cannot transfer money to your own account");
-        }
+    public Transaction transfer(String userEmail, Long receiverId, BigDecimal amount) {
 
         // Check if sender account exists in database according to account id
-        Account sender = accountRepository.findById(senderId)
+        Account senderAccount = accountRepository.findByUser_Email(userEmail)
                 .orElseThrow(() -> new BusinessException("Sender account not found"));
+
+        // Check if its a different account
+        if (senderAccount.getId().equals(receiverId)) {
+            throw new RuntimeException("You cannot transfer money to your own account");
+        }
 
         // Check if receiver account exists in database according to account id
         Account receiver = accountRepository.findById(receiverId)
                 .orElseThrow(() -> new BusinessException("Receiver account not found"));
 
-
         // Business Logic
         // 1. withdraw from sender account
-        sender.withdraw(amount);
+        senderAccount.withdraw(amount);
         // 2. deposit in to receiver account
         receiver.deposit(amount);
 
         // Save both changes in database
-        accountRepository.save(sender);
+        accountRepository.save(senderAccount);
         accountRepository.save(receiver);
 
         // Saves transaction operation in database
         Transaction tx = new Transaction();
-        tx.setSenderAccount(sender);
+        tx.setSenderAccount(senderAccount);
         tx.setReceiverAccount(receiver);
         tx.setBalance(amount);
 
         return transactionRepository.save(tx);
     }
 
+
+    // deprecated
     /**
      * Get all Account trasanctions based on account Id
      *
      * @Cacheable Cache our Transaction List when retrieving it from database
      *
-     * @param accountId
+     * @param userEmail
      * @return
      */
     @Cacheable(value = "TransactionList")
-    public List<TransactionDTO> getAllTransactionsByAccount(Long accountId){
+    public List<TransactionDTO> getAllTransactionsByAccount(String userEmail){
         List<Transaction> transactions =
-                transactionRepository.findBySenderAccountIdOrReceiverAccountId(accountId, accountId);
+                transactionRepository.findBySenderAccountIdOrReceiverAccountId(null, null);
 
         List<TransactionDTO> dtoList = new ArrayList<>();
 
@@ -99,6 +101,16 @@ public class TransactionService {
     }
 
 
+    @Cacheable(value = "AccountTransactions")
+    public List<TransactionDTO> findAllTransactionsByUserEmail(String email) {
+        List<TransactionDTO> transactions = transactionRepository.findAllTransactionsByUserEmail(email);
+
+        if(transactions == null) {
+            return new ArrayList<TransactionDTO>();
+        }
+
+        return transactions;
+    }
 
     //--------------------PRIVATE METHODS-----------------------
 

@@ -1,5 +1,6 @@
 package com.example.fintech.service;
 
+import com.example.fintech.dto.WalletDTO;
 import com.example.fintech.entity.Account;
 import com.example.fintech.entity.User;
 import com.example.fintech.exception.BusinessException;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Account Service Class
@@ -24,7 +26,7 @@ public class AccountService {
      * Perform Deposit Operation in User own account
      * @param userEmail
      * @param amount
-     * @return
+     * @return Account
      */
     public Account depositMoney(String userEmail, BigDecimal amount){
         User user = userRepository.findByEmail(userEmail)
@@ -36,6 +38,26 @@ public class AccountService {
         depositAccount.deposit(amount);
 
         return accountRepository.save(depositAccount);
+    }
+
+    /**
+     * Check Account current balance
+     * @param userEmail
+     * @return BigInteger
+     */
+    public BigDecimal currentBalance(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new BusinessException("This user dosent exist in Database"));
+
+        Account balanceAccount = accountRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new BusinessException("Account not found check balance"));
+
+        return balanceAccount.getBalance();
+    }
+
+
+    public List<WalletDTO> getAllAccountsByEmail(String userEmail) {
+        return accountRepository.findAllWallets(userEmail);
     }
 
 }

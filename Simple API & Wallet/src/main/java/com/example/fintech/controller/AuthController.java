@@ -1,5 +1,6 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.ApiResponseWrapper;
 import com.example.fintech.dto.ConfirmationCodeDTO;
 import com.example.fintech.dto.LoginRequestDTO;
 import com.example.fintech.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 /**
  * Authentication Controller class
@@ -37,9 +39,14 @@ public class AuthController {
      * @return User
      */
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody User user) {
+    public ResponseEntity<ApiResponseWrapper> register(@Valid @RequestBody User user) {
         logger.info("AuthController | METHOD: register() - REGISTER OPERATION");
-        return ResponseEntity.ok(userService.registerUser(user));
+
+        userService.registerUser(user);
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success("User registered successfully")
+        );
     }
 
     /**
@@ -48,7 +55,7 @@ public class AuthController {
      * @return String
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequestDTO loginRequest) {
         logger.info("AuthController | METHOD: login() - LOGIN OPERATION");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
@@ -56,7 +63,7 @@ public class AuthController {
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getEmail());
         final String jwt = jwtService.generateToken(userDetails);
 
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(Map.of("token", jwt));
     }
 
 

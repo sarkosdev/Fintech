@@ -3,7 +3,6 @@ package com.example.fintech.entity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -30,7 +29,7 @@ public class User {
 
     @Email
     @NotBlank( message = "Field 'email' cannot be blank")
-    @Column( name = "email", nullable = false)
+    @Column( name = "email", nullable = false, unique = true)
     private String email;
 
     @Size( min = 8, message = "Field 'password' must be at least 8 characters long")
