@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IBalanceResponse } from '../model/balance-response.model';
 import { IWallet } from '../model/wallet.model';
 import { ITransaction } from '../model/transaction.model';
+import { IApiResponse } from '../model/api-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class Wallet {
 
   // deposit money into the wallet
   deposit(amount: number) {
-    return this.http.post(
+    return this.http.post<IApiResponse>(
       `${this.accountApi}/deposit?amount=${amount}`,
       {}
     );
@@ -37,8 +38,8 @@ export class Wallet {
   }
 
   // withdraw money from the wallet
-  withdraw(receiverId: String, amount: number) {
-    return this.http.post(
+  withdraw(receiverId: String, amount: number): Observable<IApiResponse> {
+    return this.http.post<IApiResponse>(
       `${this.walletApi}/withdraw?receiverId=${receiverId}&amount=${amount}`,
       {}
     );

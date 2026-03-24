@@ -75,6 +75,7 @@ export class LoginComponent implements OnInit {
         console.log('Login successful');
 
         localStorage.setItem('token', token);
+        
         // redirecionar para Home após login bem-sucedido
         this.router.navigate(['/home']);
         window.location.reload();

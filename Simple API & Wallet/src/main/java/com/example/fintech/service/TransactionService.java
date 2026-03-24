@@ -7,6 +7,8 @@ import com.example.fintech.exception.BusinessException;
 import com.example.fintech.repository.AccountRepository;
 import com.example.fintech.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor                    // Creates constructor for dependency injection
 public class TransactionService {
 
+    private static final Logger logger = LogManager.getLogger(TransactionService.class);
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
@@ -43,6 +46,14 @@ public class TransactionService {
             })
     @Transactional
     public Transaction transfer(String userEmail, Long receiverId, BigDecimal amount) {
+        logger.info("TransactionService | METHOD: transfer() - TRYING TO TRANSFER MONEY BETWEEN ACCOUNTS " +
+                "senderEmail: {}, " +
+                "receiverId: {}, " +
+                "amount: {}, ",
+                userEmail,
+                receiverId,
+                amount);
+
 
         // Check if sender account exists in database according to account id
         Account senderAccount = accountRepository.findByUser_Email(userEmail)
@@ -50,7 +61,7 @@ public class TransactionService {
 
         // Check if its a different account
         if (senderAccount.getId().equals(receiverId)) {
-            throw new RuntimeException("You cannot transfer money to your own account");
+            throw new BusinessException("You cannot transfer money to your own account");
         }
 
         // Check if receiver account exists in database according to account id
@@ -73,19 +84,24 @@ public class TransactionService {
         tx.setReceiverAccount(receiver);
         tx.setBalance(amount);
 
+        logger.info("TransactionService | METHOD: transfer() - ABOUT TO SAVE TRANSACTION IN Account {}, with Amount {}",
+                tx.getReceiverAccount().getId(),
+                amount);
+
         return transactionRepository.save(tx);
     }
 
 
-    // deprecated
+
     /**
      * Get all Account trasanctions based on account Id
      *
      * @Cacheable Cache our Transaction List when retrieving it from database
      *
-     * @param userEmail
+     * @param
      * @return
      */
+     /* DEPRECATED
     @Cacheable(value = "TransactionList")
     public List<TransactionDTO> getAllTransactionsByAccount(String userEmail){
         List<Transaction> transactions =
@@ -99,7 +115,7 @@ public class TransactionService {
 
         return dtoList;
     }
-
+    */
 
     @Cacheable(value = "AccountTransactions")
     public List<TransactionDTO> findAllTransactionsByUserEmail(String email) {

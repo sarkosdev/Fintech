@@ -1,20 +1,15 @@
 package com.example.fintech.controller;
 
 import com.example.fintech.dto.ApiResponseWrapper;
-import com.example.fintech.dto.ErrorResponse;
 import com.example.fintech.exception.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponseWrapper> handleBusinessException(BusinessException ex) {
 
-        logger.error("Unexpected error occurred 3", ex);
+        logger.error("Unexpected error occurred BusinessException", ex);
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -61,7 +56,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponseWrapper> handleValidationException(
             org.springframework.web.bind.MethodArgumentNotValidException ex) {
 
-        logger.error("Unexpected error occurred 2", ex);
+        logger.error("Unexpected error occurred MethodArgumentNotValidException", ex);
 
         Map<String, String> errors = new HashMap<>();
 
@@ -102,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponseWrapper> handleGeneralException(Exception ex) {
 
-        logger.error("Unexpected error occurred 1: " + ex.getMessage());
+        logger.error("Unexpected error occurred Exception: " + ex.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)

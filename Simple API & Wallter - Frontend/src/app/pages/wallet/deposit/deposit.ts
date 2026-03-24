@@ -8,6 +8,7 @@ import { Wallet } from '../../../services/wallet';
 import { IBalanceResponse } from '../../../model/balance-response.model';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { IApiResponse } from '../../../model/api-response.model';
 
 
 
@@ -80,11 +81,11 @@ export class Deposit implements OnInit{
     const amount = this.depositForm.value.amount;
 
     this.walletService.deposit(amount).subscribe({
-      next: res => {
+      next: (res: IApiResponse) => {
         this.messageService.add({
           severity: 'success',
           summary: 'Deposit Successful',
-          detail: 'New deposit completed with success',
+          detail: res.message,
           life: 4000
         });
 
@@ -97,7 +98,7 @@ export class Deposit implements OnInit{
         this.messageService.add({
           severity: 'error',
           summary: 'Deposit Failed',
-          detail: "Something went wrong. Deposit didn't go through.",
+          detail: 'An error occurred during deposit',
           life: 4000
         });
         console.error("Deposit failed", err);

@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Home } from './pages/home/home';
+import { authGuard } from './guards/auth-guard';
 
 // Define application routes
 // Each route maps a URL path to a component
@@ -9,7 +10,7 @@ export const routes: Routes = [
     {
         path: 'home', component: Home
     },
-    
+
     // Login Service route
     {
         path: 'login',
@@ -31,20 +32,23 @@ export const routes: Routes = [
     {
         path: 'services/deposit-money',
         loadComponent: () => 
-            import('./pages/wallet/deposit/deposit').then(m => m.Deposit)
+            import('./pages/wallet/deposit/deposit').then(m => m.Deposit),
+            canActivate: [authGuard]
     },
 
     // Transfer Money Service route
     {
         path: 'services/transfer-money',
         loadComponent: () => 
-            import('./pages/wallet/transfer/transfer').then(m => m.TransferComponent)
+            import('./pages/wallet/transfer/transfer').then(m => m.TransferComponent),
+            canActivate: [authGuard]
     },
 
     // Transaction History Service route
     {
         path: 'services/transaction-history',
         loadComponent: () => 
-            import('./pages/wallet/wallet-transactions/wallet-transactions').then(m => m.WalletTransactionsComponent)
+            import('./pages/wallet/wallet-transactions/wallet-transactions').then(m => m.WalletTransactionsComponent),
+            canActivate: [authGuard]
     }
 ];

@@ -136,6 +136,20 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- UNIT TESTING DEPENDENCIES-->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

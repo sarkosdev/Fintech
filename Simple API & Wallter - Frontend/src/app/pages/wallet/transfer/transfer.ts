@@ -10,6 +10,7 @@ import { IWallet } from '../../../model/wallet.model';
 import {InputNumberModule } from 'primeng/inputnumber';
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
+import { IApiResponse } from '../../../model/api-response.model';
 
 
 @Component({
@@ -55,15 +56,25 @@ export class TransferComponent implements OnInit {
     console.log("Receiver wallet ID:", this.transferForm.value.walletId);
     console.log("Transfer amount:", this.transferForm.value.amount);
     this.walletService.withdraw(this.transferForm.value.walletId, this.transferForm.value.amount).subscribe({
-      next: () => {
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Transfer successful' });
+      next: (response: IApiResponse) => {
+        
+        this.messageService.add({ 
+          severity: 'success',
+          summary: 'Success',
+          detail: response.message
+        });
+        
         this.loadAccountBalance();
 
         this.transferForm.reset();
       },
-      error: (err) => {
+      error: (err: IApiResponse) => {
         console.error("Transfer failed", err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Transfer failed' });
+        this.messageService.add({ 
+          severity: 'error',
+          summary: 'Error',
+          detail: err.message 
+        });
       }
     });
   
@@ -72,19 +83,19 @@ export class TransferComponent implements OnInit {
 
 
 
-initTransferForm(): void {
-  this.transferForm = this.transfer.group({
-    walletId: [null, [Validators.required]],
-    amount: [
-      0,
-      [
-        Validators.required,
-        Validators.min(0.01),
-        this.balanceValidator(() => this.accountBalance)
+  initTransferForm(): void {
+    this.transferForm = this.transfer.group({
+      walletId: [null, [Validators.required]],
+      amount: [
+        0,
+        [
+          Validators.required,
+          Validators.min(0.01),
+          this.balanceValidator(() => this.accountBalance)
+        ]
       ]
-    ]
-  });
-}
+    });
+  }
 
 
   loadAccountBalance(): void {

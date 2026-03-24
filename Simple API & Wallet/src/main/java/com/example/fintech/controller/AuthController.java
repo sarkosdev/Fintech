@@ -52,7 +52,7 @@ public class AuthController {
     /**
      * Login User endpoint
      * @param loginRequest
-     * @return String
+     * @return Map<String, String>
      */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequestDTO loginRequest) {
@@ -70,6 +70,8 @@ public class AuthController {
     /**
      * Check user confirmationCode Endpoint
      * introduce in 'userName' your account username and you will be able to check your confirmation code
+     * This method needs to return an object of type ConfirmationCodeDTO in order to expose the code to the
+     * final User so the User can confirm his account on /confirm-code/{userName} endpoint
      * @param userName
      * @return ResponseEntity<ConfirmationCodeDTO>
      */
@@ -84,13 +86,15 @@ public class AuthController {
      * Confirmation code User Endpoint
      * @param userName
      * @param code
-     * @return String
+     * @return ResponseEntity<ApiResponseWrapper>
      */
     @PostMapping("/confirm-code/{userName}")
-    public ResponseEntity<String> confirmCode(@PathVariable("userName") String userName, @RequestParam String code) {
+    public ResponseEntity<ApiResponseWrapper> confirmCode(@PathVariable("userName") String userName, @RequestParam String code) {
         logger.info("AuthController | METHOD: confirmCode() - USER CONFIRMATION CODE INPUT OPERATION");
+
         userService.confirmUser(userName, code);
-        return ResponseEntity.ok("Account confirmed");
+
+        return ResponseEntity.ok(ApiResponseWrapper.success("Account confirmed successfully"));
     }
 
 }

@@ -21,7 +21,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      */
     List<Transaction> findBySenderAccountIdOrReceiverAccountId(Long senderId, Long receiverId);
 
-
+    /**
+     * Query for all Transactions in DB according to User email
+     * Also this query will differ the deposits and withdrawls
+     * @param email
+     * @return
+     */
     @Query("SELECT new com.example.fintech.dto.TransactionDTO(\n" +
             "            t.id,\n" +
             "            CASE\n" +

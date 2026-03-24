@@ -6,6 +6,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+/**
+ * Cors Configuration Class
+ * Global configuration class that allows our frontend angular
+ * application to call this server
+ */
 @Configuration
 public class CorsConfig {
 

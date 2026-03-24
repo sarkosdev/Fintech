@@ -1,5 +1,6 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.ApiResponseWrapper;
 import com.example.fintech.dto.WalletDTO;
 import com.example.fintech.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -31,22 +32,24 @@ public class AccountController {
      * 1. Requires to be authenticated in order to perform operation
      * @param userDetails
      * @param amount
-     * @return
+     * @return ResponseEntity<ApiResponseWrapper>
      */
     @PostMapping("/deposit")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, String>> depositMoney(@AuthenticationPrincipal UserDetails userDetails, @RequestParam BigDecimal amount) {
+    public ResponseEntity<ApiResponseWrapper> depositMoney(@AuthenticationPrincipal UserDetails userDetails, @RequestParam BigDecimal amount) {
         logger.info("TransactionController | METHOD: depositMoney() - DEPOSIT MONEY IN OWN ACCOUNT OPERATION");
 
         accountService.depositMoney(userDetails.getUsername(), amount);
 
-        return ResponseEntity.ok(Map.of("response", "Deposit completed with success with amount: " + amount.toString()));
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success("Deposit completed with success")
+        );
     }
 
     /**
-     * Get Account current balance
+     * Get Account current balance for UI porpouse
      * @param userDetails
-     * @return
+     * @return ResponseEntity<Map<String, BigDecimal>>
      */
     @GetMapping("/balance")
     @PreAuthorize("isAuthenticated()")
@@ -60,7 +63,7 @@ public class AccountController {
     /**
      * Get all Accounts available on the system
      * @param userDetails
-     * @return
+     * @return ResponseEntity<List<WalletDTO>>
      */
     @GetMapping("/get-all-accounts-system")
     @PreAuthorize("isAuthenticated()")

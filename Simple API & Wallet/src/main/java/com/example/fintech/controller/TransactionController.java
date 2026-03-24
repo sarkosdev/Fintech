@@ -1,5 +1,6 @@
 package com.example.fintech.controller;
 
+import com.example.fintech.dto.ApiResponseWrapper;
 import com.example.fintech.dto.TransactionDTO;
 import com.example.fintech.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Transaction Controller class
@@ -31,18 +31,22 @@ public class TransactionController {
      * @param userDetails
      * @param receiverId
      * @param amount
-     * @return ResponseEntity<String>
+     * @return ResponseEntity<ApiResponseWrapper>
      */
     @PostMapping("/withdraw")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Map<String, String>> sendMoneyToAccount(
+    public ResponseEntity<ApiResponseWrapper> sendMoneyToAccount(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam Long receiverId,
             @RequestParam BigDecimal amount
             ){
         logger.info("TransactionController | METHOD: sendMoneyToAccount() - SEND MONEY FROM USER ACCOUNT {} TO USER ACCOUNT {}", userDetails.getUsername(), receiverId);
+
         transactionService.transfer(userDetails.getUsername(), receiverId, amount);
-        return ResponseEntity.ok(Map.of("msg", "Transaction completed with success"));
+
+        return ResponseEntity.ok(
+                ApiResponseWrapper.success("Transaction completed with success")
+        );
     }
 
     /**

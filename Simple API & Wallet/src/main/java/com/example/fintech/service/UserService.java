@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final static Logger logger = LogManager.getLogger(AuthController.class);
+    private static final Logger logger = LogManager.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;                                          //Encodes password
     private final RequestEventProducer requestEventProducer;
@@ -62,7 +63,7 @@ public class UserService {
 
         if(user.isConfirmedAccount()) throw new BusinessException("This account is already confirmed");
 
-        if (!user.getConfirmationCode().equals(code)) throw new BusinessException("Invalid confirmation code");
+        if (!Objects.equals(user.getConfirmationCode(), code)) throw new BusinessException("Invalid confirmation code");
 
         user.setConfirmedAccount(true);
 
@@ -111,6 +112,7 @@ public class UserService {
 
     /**
      * Calls our Kafka topic in order to send RequestEvent from Producer to Consumer
+     * The goal is to create User Wallet after User is confirmed in order to use the Wallet
      */
     private void sendToKafkaProducer(User user){
 
