@@ -1,8 +1,8 @@
 # Simple API & Wallet
 
-Simple API & Wallet is a backend fintech application that allows users to **register, authenticate, and perform transactions between accounts within the system**.
+Simple API & Wallet is a fintech application that allows users to **register, authenticate, perform transactions between wallets, and deposit money in to your own wallet within the system**.
 
-The project is built using **Spring Boot** and follows modern backend development practices, including **secure authentication, database versioning, caching, and event-driven communication**.
+The project is built using **Spring Boot** for backend and follows modern backend development practices, including **secure authentication, database versioning, caching, and event-driven communication** and **Angular** for frontend.
 
 ---
 
@@ -10,12 +10,13 @@ The project is built using **Spring Boot** and follows modern backend developmen
 
 This application simulates a simplified **digital wallet system**, where users can:
 
-- Create an account
+- Register an Account
 - Authenticate securely
+- Deposit money in to your own wallet
 - Transfer money between accounts
 - Retrieve transaction history
 
-The system integrates several technologies commonly used in **real-world backend systems**, such as **Redis for caching**, **Kafka for messaging**, and **Liquibase for database versioning**.
+The system integrates several technologies commonly used in **real-world backend systems**, such as **mysql for persistante data**,  **Redis for caching**, **Kafka for messaging**, and **Liquibase for database versioning**.
 
 ---
 
@@ -124,7 +125,7 @@ Database
 
 # Prerequisites
 
-Before running the project, install the following tools:
+Before running the project, install the following:
 
 ### Java Development Kit
 
@@ -161,14 +162,14 @@ https://www.docker.com/products/docker-desktop/
 
 ```bash
 git clone https://github.com/your-username/simple-api-wallet.git
-cd simple-api-wallet
+cd Simple API & Wallet
 ```
 
 ---
 
 ### 2. Start Infrastructure Services
 
-Run the Docker Compose file:
+Run the Docker Compose file inside project directory:
 
 ```bash
 docker compose -f docker-compose-wallet-app.yaml up -d --build
@@ -183,6 +184,18 @@ This will start:
 - Kafka UI
 - Adminer database interface
 
+# Infrastructure Services
+
+The project uses Docker to run required infrastructure.
+
+| Service | Description | Port |
+|------|------|------|
+| MySQL | Main application database | 3306 |
+| Adminer | Web interface for MySQL | 8085 |
+| Redis | Caching layer | 6379 |
+| Kafka | Event messaging system | 9092 |
+| Kafka UI | Kafka monitoring interface | 8083 |
+
 ---
 
 ### 3. Build the project
@@ -195,7 +208,7 @@ Instead you chould just build and run the application in an IDEA like Intellij
 
 ---
 
-### 4. Run the application
+### 4. Run the application - backend (outside IDE)
 
 ```bash
 mvn spring-boot:run
@@ -215,19 +228,20 @@ http://localhost:8080
 
 ---
 
-# Infrastructure Services
+### 5. Run the application - frontend 
 
-The project uses Docker to run required infrastructure.
+```bash
+cd Simple API & Wallet - Frontend
+ng serve
+```
 
-| Service | Description | Port |
-|------|------|------|
-| MySQL | Main application database | 3306 |
-| Adminer | Web interface for MySQL | 8085 |
-| Redis | Caching layer | 6379 |
-| Kafka | Event messaging system | 9092 |
-| Kafka UI | Kafka monitoring interface | 8083 |
+Frontend application will start at:
 
----
+```
+http://localhost:4200
+```
+
+After you got both applications running (backend and frontend) you will be able to run the application as a whole, performing all kind of operations using UI made with angular and primeng library
 
 # MySQL Database
 
@@ -581,7 +595,6 @@ This demonstrates the implementation of **message-driven architecture** inside t
 Planned improvements include:
 
 - API documentation with Swagger/OpenAPI
-- Frontend web interface
 - Dockerized deployment
 - Monitoring and logging tools
 - CI/CD pipeline
