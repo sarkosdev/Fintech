@@ -1,0 +1,8 @@
+com\example\fintech\service\UserServiceTest.class
+com\example\fintech\service\AccountServiceTest.class
+com\example\fintech\controller\AuthControllerTest.class
+com\example\fintech\repository\UserRepositoryTest.class
+com\example\fintech\service\TransactionServiceTest.class
+com\example\fintech\helper\TestAccountFactory.class
+com\example\fintech\Micro2ApplicationTests.class
+com\example\fintech\helper\TestUserFactory.class

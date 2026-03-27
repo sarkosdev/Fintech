@@ -170,6 +170,9 @@ cd Simple API & Wallet
 ### 2. Start Infrastructure Services
 
 Run the Docker Compose file inside project directory:
+Use *-d* flag in order to free the console windows without the logs, or delete it if you want to check all logs while running
+Use *--build* in order to allways re-build our *docker-compose-wallet-app.yaml*, specially when we make changes to it
+
 
 ```bash
 docker compose -f docker-compose-wallet-app.yaml up -d --build

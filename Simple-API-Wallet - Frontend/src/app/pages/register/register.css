@@ -1,0 +1,36 @@
+.form-wrapper {
+  margin-top: 10vh;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Title */
+.register {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Form box */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 300px;
+}
+
+/* Input field layout */
+.p-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.error {
+  color: #f87171;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}

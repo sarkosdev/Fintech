@@ -1,0 +1,77 @@
+<div class="transfer-container">
+
+    <!-- MESSSAGE SECTION COMPONENT-->
+    <p-toast position="top-right"></p-toast>
+
+
+  <div class="card">
+
+
+
+    <!-- BALANCE -->
+    <div class="balance-section">
+      <span class="balance-label">Current Balance</span>
+      <div class="balance-value">
+        {{ accountBalance | currency:'EUR' }}
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="transferForm" (ngSubmit)="submit()" class="transfer-form">
+
+      <h2>Transfer Money</h2>
+
+      <div class="field">
+        
+
+        <!-- Distrito -->
+        <div class="field">
+          <label>Wallet Email</label>
+
+          <p-select
+            formControlName="walletId"
+            [options]="walletsAvailable"
+            optionLabel="email"
+            optionValue="accountId"
+            placeholder="Select a wallet"
+            [filter]="true">
+          </p-select>
+          <small class="error" *ngIf="isInvalid('walletId')">
+            This field cannot be empty
+          </small>
+        </div>
+        
+        <label for="amount">Transfer Amount</label>
+        <p-inputnumber
+          formControlName="amount"
+          mode="currency"
+          currency="EUR"
+          locale="de-DE"
+          inputId="amount">
+        </p-inputnumber>
+
+        <small class="error" *ngIf="transferForm.get('amount')?.errors?.['insufficientBalance']">
+          Insufficient balance
+        </small>
+        <small class="error" *ngIf="amountIsInvalid('amount')">
+          Enter a valid amount
+        </small>
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Transfer"
+        icon="pi pi-check"
+        class="transfer-button"
+        [disabled]="transferForm.invalid">
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+
