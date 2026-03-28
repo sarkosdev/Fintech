@@ -1,0 +1,82 @@
+<h2 class="title">Transaction History</h2>
+
+<p-table
+  [value]="transactions"
+  [paginator]="true"
+  [rows]="10"
+  sortField="timestamp"
+  [sortOrder]="-1"
+  responsiveLayout="scroll"
+  class="transaction-table">
+
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="timestamp">
+        Date
+        <p-sortIcon field="timestamp"></p-sortIcon>
+      </th>
+
+      <th>Type</th>
+
+      <th>Counterparty</th>
+
+      <th pSortableColumn="balance">
+        Amount
+        <p-sortIcon field="balance"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-t>
+
+    <tr>
+
+      <!-- DATE -->
+      <td>
+        {{ t.timestamp | date:'medium' }}
+      </td>
+
+      <!-- TYPE -->
+      <td>
+
+        <span
+          class="type payment"
+          *ngIf="t.operationType === 'PAYMENT'">
+
+          <i class="pi pi-arrow-up"></i>
+          Payment
+
+        </span>
+
+        <span
+          class="type credit"
+          *ngIf="t.operationType === 'CREDIT'">
+
+          <i class="pi pi-arrow-down"></i>
+          Credit
+
+        </span>
+
+      </td>
+
+      <!-- COUNTERPARTY -->
+      <td>
+        {{ t.counterpartyEmail }}
+      </td>
+
+      <!-- AMOUNT -->
+      <td
+        [ngClass]="{
+          'amount-credit': t.balance > 0,
+          'amount-debit': t.balance < 0
+        }">
+
+        {{ t.balance | currency:'EUR' }}
+
+      </td>
+
+    </tr>
+
+  </ng-template>
+
+</p-table>

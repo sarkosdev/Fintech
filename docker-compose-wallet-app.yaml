@@ -27,7 +27,7 @@ services:
   # Server: mysql
   # username: root
   # password: root
-  # database: ecommerce
+  # database: fintech-db
   adminer:
     image: adminer:5.2.1
     container_name: adminer-walltet

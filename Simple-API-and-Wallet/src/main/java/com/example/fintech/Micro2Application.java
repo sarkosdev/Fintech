@@ -15,7 +15,7 @@ public class Micro2Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Micro2Application.class, args);
-		logger.info("Application :: " + appName + " -> STARTED WITH SUCCESS");
+		logger.debug("Application :: " + appName + " -> STARTED WITH SUCCESS");
 	}
 
 }

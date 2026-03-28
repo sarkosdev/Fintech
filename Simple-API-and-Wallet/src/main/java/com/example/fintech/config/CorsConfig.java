@@ -20,7 +20,9 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedOrigin("http://localhost:4200");   // localdev
+        config.addAllowedOrigin("http://localhost:4300");   // dev env 2
+        config.addAllowedOrigin("http://localhost:8088");   // prod env
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
 

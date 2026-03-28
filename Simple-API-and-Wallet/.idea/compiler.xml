@@ -9,12 +9,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="micro2" />
         <module name="Simple API &amp; Wallet" />
+        <module name="Simple-API-and-Wallet" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Simple API &amp; Wallet" options="-parameters" />
+      <module name="Simple-API-and-Wallet" options="-parameters" />
       <module name="micro2" options="-parameters" />
     </option>
   </component>

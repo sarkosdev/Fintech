@@ -117,6 +117,7 @@ public class UserService {
     private void sendToKafkaProducer(User user){
 
         RequestEvent requestEvent = new RequestEvent();
+        requestEvent.setUserId(user.getId());
         requestEvent.setUserEmail(user.getEmail());
         requestEvent.setGiveAwayFreeAmount(new BigDecimal(100));
 
