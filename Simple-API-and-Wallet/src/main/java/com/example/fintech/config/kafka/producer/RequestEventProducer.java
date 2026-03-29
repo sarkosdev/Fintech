@@ -27,7 +27,6 @@ public class RequestEventProducer {
         // Order requests by ID
         String key = payload.getUserId().toString();
 
-
         kafkaTemplate.send(
                         TOPIC,
                         key,
