@@ -1,7 +1,6 @@
 package com.example.fintech.service;
 
 import com.example.fintech.config.kafka.producer.RequestEventProducer;
-import com.example.fintech.controller.AuthController;
 import com.example.fintech.dto.ConfirmationCodeDTO;
 import com.example.fintech.dto.RequestEvent;
 import com.example.fintech.entity.User;

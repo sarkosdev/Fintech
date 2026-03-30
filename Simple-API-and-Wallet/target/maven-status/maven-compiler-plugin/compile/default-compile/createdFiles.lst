@@ -32,3 +32,4 @@ com\example\fintech\config\kafka\KafkaConfig.class
 com\example\fintech\dto\WalletDTO.class
 com\example\fintech\repository\TransactionRepository.class
 com\example\fintech\controller\AuthController.class
+com\example\fintech\dto\LoginResponseDTO.class

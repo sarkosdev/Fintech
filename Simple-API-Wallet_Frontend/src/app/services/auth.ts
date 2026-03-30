@@ -1,7 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ILoginRequest } from '../model/login.model';
+import { ILoginRequest, ILoginResponse } from '../model/login.model';
 import { isPlatformBrowser } from '@angular/common';
 import { IRegisterRequest } from '../model/register.model';
 import { IApiResponse } from '../model/api-response.model';
@@ -11,7 +11,7 @@ import { IApiResponse } from '../model/api-response.model';
 })
 export class AuthService {
 
-  private loggedIn = new BehaviorSubject<boolean>(this.isLogged());
+  private loggedIn = new BehaviorSubject<boolean>(false);
   isLoggedIn$ = this.loggedIn.asObservable();
 
  //backend api url
@@ -19,10 +19,14 @@ export class AuthService {
 
   platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loggedIn.next(this.hasToken());
+    }
+  }
 
-  login(loginRequest: ILoginRequest): Observable<any> {
-    return this.http.post(`${this.api}/login`, loginRequest);
+  login(loginRequest: ILoginRequest): Observable<ILoginResponse> {
+    return this.http.post<ILoginResponse>(`${this.api}/login`, loginRequest);
   }
 
   register(registerRequest: IRegisterRequest): Observable<IApiResponse> {
@@ -30,9 +34,11 @@ export class AuthService {
   }
 
   saveToken(token: string) {
-    localStorage.setItem("token", token);
-    this.loggedIn.next(true); // 🔥 triggers UI update
-  } 
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem("token", token);
+    }
+    this.loggedIn.next(true);
+  }
 
   getToken(): string | null {
     if (isPlatformBrowser(this.platformId)) {
@@ -42,8 +48,10 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem('email');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userEmail");
+    }
     this.loggedIn.next(false);
   }
 
@@ -52,14 +60,19 @@ export class AuthService {
   }
 
   // Retrieve email from localStorage
-  /*
   getEmail(): string | null {
     if (isPlatformBrowser(this.platformId)) {
-      return localStorage.getItem('email');
+      return localStorage.getItem("userEmail");
     }
     return null;
   }
-    */
+
+  hasToken(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return !!localStorage.getItem("token");
+    }
+    return false;
+  }
 
 
 

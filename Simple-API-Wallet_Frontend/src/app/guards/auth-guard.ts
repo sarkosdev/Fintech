@@ -1,9 +1,11 @@
 import { CanActivateFn, Router } from '@angular/router';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export const authGuard: CanActivateFn = (route, state) => {
 
   const router = inject(Router);
+  const platformId = inject(PLATFORM_ID);
 
   function isTokenExpired(token: string) {
     try {
@@ -16,8 +18,12 @@ export const authGuard: CanActivateFn = (route, state) => {
     
   }
 
-  const token = localStorage.getItem('token');
+  let token: string | null = null;
   
+
+  if (isPlatformBrowser(platformId)) {
+    token = localStorage.getItem('token'); // ✅ SAFE
+  }
 
   if (token && !isTokenExpired(token)) {
     return true;

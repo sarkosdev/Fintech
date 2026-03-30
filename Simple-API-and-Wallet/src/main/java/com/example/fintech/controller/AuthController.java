@@ -3,6 +3,7 @@ package com.example.fintech.controller;
 import com.example.fintech.dto.ApiResponseWrapper;
 import com.example.fintech.dto.ConfirmationCodeDTO;
 import com.example.fintech.dto.LoginRequestDTO;
+import com.example.fintech.dto.LoginResponseDTO;
 import com.example.fintech.entity.User;
 import com.example.fintech.security.CustomUserDetailsService;
 import com.example.fintech.service.JwtService;
@@ -17,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
 
 /**
  * Authentication Controller class
@@ -55,7 +55,7 @@ public class AuthController {
      * @return Map<String, String>
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequestDTO loginRequest) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
         logger.info("AuthController | METHOD: login() - LOGIN OPERATION");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
@@ -63,7 +63,7 @@ public class AuthController {
         final UserDetails userDetails = customUserDetailsService.loadUserByUsername(loginRequest.getEmail());
         final String jwt = jwtService.generateToken(userDetails);
 
-        return ResponseEntity.ok(Map.of("token", jwt));
+        return ResponseEntity.ok(new LoginResponseDTO(jwt));
     }
 
 
@@ -94,7 +94,7 @@ public class AuthController {
 
         userService.confirmUser(userName, code);
 
-        return ResponseEntity.ok(ApiResponseWrapper.success("Account confirmed successfully"));
+        return ResponseEntity.ok(ApiResponseWrapper.success("Account confirmed successfully and Wallet created for this Account"));
     }
 
 }

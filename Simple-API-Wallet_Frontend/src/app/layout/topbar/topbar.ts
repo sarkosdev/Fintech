@@ -6,13 +6,17 @@ import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-topbar',
   imports: [
     MenubarModule,
     RouterModule,
-    ToastModule
+    ToastModule,
+    CommonModule
   ],
   providers: [MessageService],
   templateUrl: './topbar.html',
@@ -26,6 +30,7 @@ export class Topbar implements OnInit {
   // Menu items for the top bar
   items: MenuItem[] = [];
 
+  platformId = inject(PLATFORM_ID);
   userEmail: string | null = null;
 
   constructor(
@@ -37,15 +42,26 @@ export class Topbar implements OnInit {
   
 
   ngOnInit(): void {
-    this.authService.isLoggedIn$.subscribe(() => {
-      //this.userEmail = this.authService.getEmail();
-      this.buildMenu(); 
-    });
+    
+    if (isPlatformBrowser(this.platformId)) { 
+      this.userEmail = localStorage.getItem('userEmail');
+      
+      this.authService.isLoggedIn$.subscribe(() => {
+        this.buildMenu(); 
+      });
+    }
   }
 
   buildMenu(): void {
     if (this.authService.isLogged()) {
       this.items = [
+
+        // EMAIL LABEL
+        {
+          label: `Hi, ${this.userEmail ?? ''}`,
+          styleClass: 'user-label-item',
+          disabled: true // Disable interaction for the email label
+        },
 
         {label: 'Home', icon: 'pi pi-home', routerLink: '/home' },
 

@@ -3,7 +3,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ILoginRequest } from '../../model/login.model';
+import { ILoginRequest, ILoginResponse } from '../../model/login.model';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
@@ -67,12 +67,10 @@ export class LoginComponent implements OnInit {
     };
 
     this.authService.login(payload).subscribe({
-      next: (response) => {
+      next: (response: ILoginResponse) => {
 
         const token = response.token;
         this.authService.saveToken(token);
-
-        console.log('Login successful');
 
         localStorage.setItem('token', token);
         localStorage.setItem('userEmail', payload.email);
@@ -88,12 +86,10 @@ export class LoginComponent implements OnInit {
           summary: 'Login Failed',
           detail: message
         });
-        //console.error('Login failed', error);
       },
       complete: () => {
         // redirecionar para Home após login bem-sucedido
         this.router.navigate(['/home']);
-        //window.location.reload();
       }
 
     });

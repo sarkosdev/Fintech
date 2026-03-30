@@ -2,7 +2,6 @@ package com.example.fintech.repository;
 
 
 import com.example.fintech.entity.User;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;

@@ -21,6 +21,7 @@ C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\entity\Account.java
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\repository\AccountRepository.java
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\config\kafka\consumer\RequestEventConsumer.java
+C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\dto\LoginResponseDTO.java
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\entity\User.java
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\service\TransactionService.java
 C:\Simple-API-and-Wallet\Simple-API-and-Wallet\src\main\java\com\example\fintech\controller\AuthController.java
