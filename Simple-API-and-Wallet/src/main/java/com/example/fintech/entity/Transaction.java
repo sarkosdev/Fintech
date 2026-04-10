@@ -29,7 +29,7 @@ public class Transaction {
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
-    @Getter
+    @Setter(AccessLevel.NONE)
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime timestamp;
 

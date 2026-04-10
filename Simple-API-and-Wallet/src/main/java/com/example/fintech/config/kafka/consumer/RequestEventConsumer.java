@@ -40,7 +40,7 @@ public class RequestEventConsumer {
     public void receiveRequestEvent(RequestEvent event, @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key) {
         log.info("Intercepted request via Kafka with ID [key={}]: {}", key, event.toString());
 
-        handlesAccountCreationRequest(event.getUserEmail(), event.getGiveAwayFreeAmount());
+        handlesAccountCreationRequest(event.getEmail(), event.getGiveAwayFreeAmount());
     }
 
     /**

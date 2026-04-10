@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = (route, state) => {
       const expiry = payload.exp * 1000;
       return Date.now() > expiry;
     } catch (e) {
-      return true; // If token is malformed, consider it expired
+      return true;
     }
     
   }

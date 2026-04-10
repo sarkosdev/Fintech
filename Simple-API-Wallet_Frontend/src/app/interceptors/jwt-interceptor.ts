@@ -9,7 +9,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
 
   if (isPlatformBrowser(platformId)) {
-    token = localStorage.getItem('token'); // ✅ SAFE
+    token = localStorage.getItem('token');
   }
 
   if (token) {

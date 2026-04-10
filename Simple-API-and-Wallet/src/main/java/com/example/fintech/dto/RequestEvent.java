@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class RequestEvent {
 
-    private Long userId;
-    private String userEmail;
+    private Long id;
+    private String email;
     private BigDecimal giveAwayFreeAmount;
 
 }

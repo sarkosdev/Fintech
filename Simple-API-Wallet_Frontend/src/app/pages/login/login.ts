@@ -72,6 +72,8 @@ export class LoginComponent implements OnInit {
         const token = response.token;
         this.authService.saveToken(token);
 
+        //console.log('Login successful, received token:', payload.email);
+        
         localStorage.setItem('token', token);
         localStorage.setItem('userEmail', payload.email);
 

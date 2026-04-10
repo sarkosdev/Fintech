@@ -54,6 +54,7 @@ export class Topbar implements OnInit {
 
   buildMenu(): void {
     if (this.authService.isLogged()) {
+      //console.log('User is logged in, building menu with user email:', this.userEmail);
       this.items = [
 
         // EMAIL LABEL

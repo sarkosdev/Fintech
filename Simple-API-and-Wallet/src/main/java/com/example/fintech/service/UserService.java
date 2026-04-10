@@ -3,9 +3,14 @@ package com.example.fintech.service;
 import com.example.fintech.config.kafka.producer.RequestEventProducer;
 import com.example.fintech.dto.ConfirmationCodeDTO;
 import com.example.fintech.dto.RequestEvent;
+import com.example.fintech.dto.UserPayload;
+import com.example.fintech.entity.Outbox;
 import com.example.fintech.entity.User;
 import com.example.fintech.exception.BusinessException;
+import com.example.fintech.repository.OutboxRepository;
 import com.example.fintech.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,8 +31,10 @@ public class UserService {
 
     private static final Logger logger = LogManager.getLogger(UserService.class);
     private final UserRepository userRepository;
+    private final OutboxRepository outboxRepository;
     private final PasswordEncoder passwordEncoder;                                          //Encodes password
     private final RequestEventProducer requestEventProducer;
+
 
     /**
      * Register User
@@ -56,6 +63,7 @@ public class UserService {
      * @param code
      * @return User
      */
+    @Transactional
     public void confirmUser(String email, String code) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalStateException("User not found"));
@@ -69,9 +77,20 @@ public class UserService {
         try {
             userRepository.save(user);
 
+            String payloadJson = userPayloadData(user);
+
+            if(!payloadJson.isEmpty()) {
+                Outbox event = new Outbox();
+                event.setEventType("WALLET_CREATION");
+                event.setPayload(payloadJson);
+                event.setStatus("PENDING");
+
+                outboxRepository.save(event);
+            }
+
             // If it saved successfully send RequestEvent for our Kafka Topic (Message Driven Design)
             // In order to create an Account for this User
-            sendToKafkaProducer(user);
+            //sendToKafkaProducer(user);
         }
         catch (Exception e) {
             logger.error("Error during confirmUser OPERATION", e);
@@ -116,14 +135,36 @@ public class UserService {
     private void sendToKafkaProducer(User user){
 
         RequestEvent requestEvent = new RequestEvent();
-        requestEvent.setUserId(user.getId());
-        requestEvent.setUserEmail(user.getEmail());
+        requestEvent.setId(user.getId());
+        requestEvent.setEmail(user.getEmail());
         requestEvent.setGiveAwayFreeAmount(new BigDecimal(100));
 
         logger.info("UserService | METHOD: sendToKafkaProducer() ABOUT TO SEND MESSAGE with payload: {}"
                 , requestEvent.toString());
 
         requestEventProducer.send(requestEvent);
+    }
+
+    /**
+     * Converts User 'id' and 'email' in to a String payload for Outbox Design Pattern
+     * @param user
+     * @return
+     */
+    private String userPayloadData(User user) {
+        UserPayload payload = new UserPayload();
+        String payloadReturn = new String();
+
+        payload.setId(user.getId());
+        payload.setEmail(user.getEmail());
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            payloadReturn = objectMapper.writeValueAsString(payload);
+        }
+        catch (JsonProcessingException e) {
+            logger.error("Error processing payload, {}", e.getMessage());
+        }
+
+        return payloadReturn;
     }
 
 }
