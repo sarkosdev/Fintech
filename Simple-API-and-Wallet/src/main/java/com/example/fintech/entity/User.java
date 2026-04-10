@@ -12,7 +12,6 @@ import javax.validation.constraints.Size;
 /**
  * This class maps the DB Entity 'User'
  */
-
 @Data
 @Entity
 @Table( name = "user")

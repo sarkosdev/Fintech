@@ -129,6 +129,8 @@ public class UserService {
     }
 
     /**
+     * CURRENTLY DEPRECATED - SWAPPED WITH OUTBOX DESIGN PATTERN APPROACH
+     *
      * Calls our Kafka topic in order to send RequestEvent from Producer to Consumer
      * The goal is to create User Wallet after User is confirmed in order to use the Wallet
      */

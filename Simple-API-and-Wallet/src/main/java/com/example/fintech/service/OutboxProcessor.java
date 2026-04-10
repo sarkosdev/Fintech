@@ -39,20 +39,20 @@ public class OutboxProcessor {
 
         logger.info("Outbox Worker has been executed -> START");
 
-        List<Outbox> events = outboxRepository.findAllByStatus("PENDING");
+        List<Outbox> events = outboxRepository.findTop20ByStatusOrderByTimestampAsc("PENDING");
 
         for (Outbox event : events) {
             try {
                 sendToKafkaProducer(event);
 
                 event.setStatus("SENT");
-                outboxRepository.save(event);
-
             } catch (Exception e) {
                 logger.info("Couldn't process it properly, retying later, {}", event.toString());
                 logger.error("Exception Thrown: {}", e.getMessage());
             }
         }
+
+        outboxRepository.saveAll(events);
 
         logger.info("Outbox Worker has been paused -> END");
     }
