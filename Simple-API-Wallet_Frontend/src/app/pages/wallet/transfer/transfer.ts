@@ -11,6 +11,7 @@ import {InputNumberModule } from 'primeng/inputnumber';
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { IApiResponse } from '../../../model/api-response.model';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 
 @Component({
@@ -21,7 +22,8 @@ import { IApiResponse } from '../../../model/api-response.model';
     ToastModule,
     ButtonModule,
     InputNumberModule,
-    SelectModule
+    SelectModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService],
   templateUrl: './transfer.html',
@@ -34,6 +36,7 @@ export class TransferComponent implements OnInit {
   amount: number = 0;
   messages: any[] = [];
   walletsAvailable: IWallet[] = [];
+  isLoading: boolean = false;
 
 
   constructor(
@@ -52,35 +55,41 @@ export class TransferComponent implements OnInit {
 
   submit(): void {
     
-    console.log("Transfer amount:", this.transferForm.value.amount);
-    console.log("Receiver wallet ID:", this.transferForm.value.walletId);
-    console.log("Transfer amount:", this.transferForm.value.amount);
+    this.isLoading = true;
+    let apiResponse: IApiResponse;
+
+    // TRANSFER OPERATION BETWEEN WALLETS
     this.walletService.withdraw(this.transferForm.value.walletId, this.transferForm.value.amount).subscribe({
       next: (response: IApiResponse) => {
-        
-        this.messageService.add({ 
-          severity: 'success',
-          summary: 'Success',
-          detail: response.message
-        });
-        
-        this.loadAccountBalance();
-
+        apiResponse = response;
         this.transferForm.reset();
       },
       error: (err: IApiResponse) => {
-        console.error("Transfer failed", err);
-        this.messageService.add({ 
-          severity: 'error',
-          summary: 'Error',
-          detail: err.message 
-        });
+        setTimeout(() => {
+          this.isLoading = false;
+          this.messageService.add({ 
+            severity: 'error',
+            summary: 'Error',
+            detail: err.message 
+          });
+        }, 2000);
+      },
+      complete: () => {
+        setTimeout(() => {
+          this.isLoading = false;
+          this.messageService.add({ 
+            severity: 'success',
+            summary: 'Success',
+            detail: apiResponse.message
+          });
+          this.loadAccountBalance();
+        }, 2000);
+        
+        
       }
     });
   
   }
-
-
 
 
   initTransferForm(): void {
@@ -151,8 +160,6 @@ export class TransferComponent implements OnInit {
     const control = this.transferForm.get(field);
     return !!(control && control.invalid && control.touched);
   }
-
-
 
 }
 

@@ -1,82 +1,102 @@
-<h2 class="title">Transaction History</h2>
 
-<p-table
-  [value]="transactions"
-  [paginator]="true"
-  [rows]="10"
-  sortField="timestamp"
-  [sortOrder]="-1"
-  responsiveLayout="scroll"
-  class="transaction-table">
 
-  <ng-template pTemplate="header">
-    <tr>
-      <th pSortableColumn="timestamp">
-        Date
-        <p-sortIcon field="timestamp"></p-sortIcon>
-      </th>
 
-      <th>Type</th>
+  <!-- MESSSAGE SECTION COMPONENT-->
+  <p-toast position="top-right"></p-toast>
 
-      <th>Counterparty</th>
+  <h2 class="title">Transaction History</h2>
 
-      <th pSortableColumn="balance">
-        Amount
-        <p-sortIcon field="balance"></p-sortIcon>
-      </th>
-    </tr>
-  </ng-template>
 
-  <ng-template pTemplate="body" let-t>
+  <p-table
+    [value]="transactions"
+    [paginator]="true"
+    [rows]="10"
+    sortField="timestamp"
+    [sortOrder]="-1"
+    responsiveLayout="scroll"
+    class="transaction-table">
 
-    <tr>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="timestamp">
+          Date
+          <p-sortIcon field="timestamp"></p-sortIcon>
+        </th>
 
-      <!-- DATE -->
-      <td>
-        {{ t.timestamp | date:'medium' }}
-      </td>
+        <th>Type</th>
 
-      <!-- TYPE -->
-      <td>
+        <th>Counterparty</th>
 
-        <span
-          class="type payment"
-          *ngIf="t.operationType === 'PAYMENT'">
+        <th pSortableColumn="balance">
+          Amount
+          <p-sortIcon field="balance"></p-sortIcon>
+        </th>
+      </tr>
+    </ng-template>
 
-          <i class="pi pi-arrow-up"></i>
-          Payment
+    <ng-template pTemplate="body" let-t>
 
-        </span>
+      <tr>
 
-        <span
-          class="type credit"
-          *ngIf="t.operationType === 'CREDIT'">
+        <!-- DATE -->
+        <td>
+          {{ t.timestamp | date:'medium' }}
+        </td>
 
-          <i class="pi pi-arrow-down"></i>
-          Credit
+        <!-- TYPE -->
+        <td>
 
-        </span>
+          <span
+            class="type payment"
+            *ngIf="t.operationType === 'PAYMENT'">
 
-      </td>
+            <i class="pi pi-arrow-up"></i>
+            Payment
 
-      <!-- COUNTERPARTY -->
-      <td>
-        {{ t.counterpartyEmail }}
-      </td>
+          </span>
 
-      <!-- AMOUNT -->
-      <td
-        [ngClass]="{
-          'amount-credit': t.balance > 0,
-          'amount-debit': t.balance < 0
-        }">
+          <span
+            class="type credit"
+            *ngIf="t.operationType === 'CREDIT'">
 
-        {{ t.balance | currency:'EUR' }}
+            <i class="pi pi-arrow-down"></i>
+            Credit
 
-      </td>
+          </span>
 
-    </tr>
+        </td>
 
-  </ng-template>
+        <!-- COUNTERPARTY -->
+        <td>
+          {{ t.counterpartyEmail }}
+        </td>
 
-</p-table>
+        <!-- AMOUNT -->
+        <td
+          [ngClass]="{
+            'amount-credit': t.balance > 0,
+            'amount-debit': t.balance < 0
+          }">
+
+          {{ t.balance | currency:'EUR' }}
+
+        </td>
+
+      </tr>
+
+    </ng-template>
+
+  </p-table>
+
+  <!--SPINNER-->
+  <!-- BLOCKING OVERLAY -->
+  <div class="overlay" *ngIf="isLoading">
+    <p-progressSpinner
+      strokeWidth="4"
+      animationDuration="1s">
+    </p-progressSpinner>
+  </div>
+
+
+
+

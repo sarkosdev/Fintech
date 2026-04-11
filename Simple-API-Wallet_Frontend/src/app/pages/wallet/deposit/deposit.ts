@@ -9,7 +9,7 @@ import { IBalanceResponse } from '../../../model/balance-response.model';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { IApiResponse } from '../../../model/api-response.model';
-
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 
 
@@ -21,6 +21,7 @@ import { IApiResponse } from '../../../model/api-response.model';
     InputNumberModule,
     ButtonModule,
     ToastModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService],
   templateUrl: './deposit.html',
@@ -32,15 +33,14 @@ export class Deposit implements OnInit{
   accountBalance: number | undefined;
   amount: number = 0;
   messages: any[] = [];
+  isLoading: boolean = false;
 
   constructor(
     private deposit: FormBuilder, 
     private walletService: Wallet, 
     private messageService: MessageService
   
-  ) 
-    { }
-
+  ) { }
 
 
   ngOnInit(): void {
@@ -72,36 +72,44 @@ export class Deposit implements OnInit{
   }
 
   submit(): void { 
-    console.log('Deposit amount:', this.depositForm.value.amount);
-
+    
     if (this.depositForm.invalid) {
-    return;
-  }
+      return;
+    }
+
+    this.isLoading = true;
+    let apiResponse: IApiResponse;
 
     const amount = this.depositForm.value.amount;
 
     this.walletService.deposit(amount).subscribe({
       next: (res: IApiResponse) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deposit Successful',
-          detail: res.message,
-          life: 4000
-        });
-
-        this.loadAccountBalance();
+        apiResponse = res;
+        
         this.depositForm.reset({ amount: 0 });
-
-        console.log("Deposit success", res);
       },
       error: err => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Deposit Failed',
-          detail: 'An error occurred during deposit',
-          life: 4000
-        });
-        console.error("Deposit failed", err);
+        setTimeout(() => {
+          this.isLoading = false;
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Deposit Failed',
+            detail: 'An error occurred during deposit',
+            life: 4000
+          });
+        }, 2000);
+      },
+      complete: () => { 
+        setTimeout(() => {
+          this.isLoading = false;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Deposit Successful',
+            detail: apiResponse.message,
+            life: 4000
+          });
+          this.loadAccountBalance();
+        }, 2000);
       }
     });
 

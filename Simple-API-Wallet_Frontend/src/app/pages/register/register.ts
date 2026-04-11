@@ -9,6 +9,8 @@ import { IRegisterRequest } from '../../model/register.model';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { IApiResponse } from '../../model/api-response.model';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +20,8 @@ import { Router } from '@angular/router';
     ButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinner
   ],
   providers: [MessageService ],
   templateUrl: './register.html',
@@ -26,6 +29,7 @@ import { Router } from '@angular/router';
 })
 export class RegisterComponent implements OnInit {
 
+  isLoading: boolean = false;
   registerForm!: FormGroup;
 
   constructor(
@@ -51,47 +55,49 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
+
     const payload: IRegisterRequest = {
       name: this.registerForm.value.username,
       email: this.registerForm.value.email,
       password: this.registerForm.value.password
     };
 
+    let apiResponse: IApiResponse;
 
     this.authService.register(payload).subscribe({
-      next: (response) => {
-
-        this.messageService.add({ 
-          severity: 'success',
-          summary: 'Success',
-          detail: response.message,
-          life: 4000 
-        });
-
+      next: (response: IApiResponse) => {
+        apiResponse = response;
       },
       error: (error) => {
+        setTimeout(() => { 
+          this.isLoading = false;
+          const message = error?.error?.message || error?.error?.error || "Registration failed";
 
-        console.log("FULL ERROR:", error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Registration Error',
+            detail: message
+          });
+        }, 2000);
 
-        const message =
-          error?.error?.message ||
-          error?.error?.error ||
-          "Registration failed";
-
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Registration Error',
-          detail: message
-        });
+      }, complete: () => {
+        setTimeout(() => {
+          this.isLoading = false;
+          this.messageService.add({ 
+            severity: 'success',
+            summary: 'Success',
+            detail: apiResponse.message,
+            life: 4000 
+          });
+        }, 2000);
       }
     });
   }
 
 
   // HELPER METHODS
-
   removeSpacesFromEmail(event: Event) {
-
     const input = event.target as HTMLInputElement;
 
     input.value = input.value.replace(/\s/g, '');
@@ -99,7 +105,6 @@ export class RegisterComponent implements OnInit {
     this.registerForm.patchValue({
       email: input.value
     });
-
   }
 
   isInvalid(field: string): boolean {
@@ -110,27 +115,23 @@ export class RegisterComponent implements OnInit {
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
 
     const password = control.get('password');
-  const confirmPassword = control.get('confirmPassword');
+    const confirmPassword = control.get('confirmPassword');
 
-  if (!password || !confirmPassword) {
+    if (!password || !confirmPassword) {
+      return null;
+    }
+
+    if (confirmPassword.errors && !confirmPassword.errors['passwordMismatch']) {
+      return null;
+    }
+
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+    } else {
+      confirmPassword.setErrors(null);
+    }
+
     return null;
-  }
-
-  if (confirmPassword.errors && !confirmPassword.errors['passwordMismatch']) {
-    return null;
-  }
-
-  if (password.value !== confirmPassword.value) {
-
-    confirmPassword.setErrors({ passwordMismatch: true });
-
-  } else {
-
-    confirmPassword.setErrors(null);
-
-  }
-
-  return null;
   }
 
 }

@@ -9,6 +9,8 @@ import { AuthService } from '../../services/auth';
 import { Router } from '@angular/router';
 import {MessageService} from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 
 @Component({
   selector: 'app-login',
@@ -18,7 +20,8 @@ import { ToastModule } from 'primeng/toast';
     ButtonModule,
     ReactiveFormsModule,
     CommonModule,
-    ToastModule
+    ToastModule,
+    ProgressSpinnerModule
   ],
   providers: [MessageService],
   templateUrl: './login.html',
@@ -27,6 +30,7 @@ import { ToastModule } from 'primeng/toast';
 export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder, 
@@ -61,6 +65,8 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
+
     const payload: ILoginRequest = {
       email: this.loginForm.value.email,
       password: this.loginForm.value.password
@@ -71,29 +77,33 @@ export class LoginComponent implements OnInit {
 
         const token = response.token;
         this.authService.saveToken(token);
-
-        //console.log('Login successful, received token:', payload.email);
         
         localStorage.setItem('token', token);
         localStorage.setItem('userEmail', payload.email);
 
       },
       error: (error) => {
-        const message =
+        setTimeout(() => {
+          this.isLoading = false;
+          const message =
           error?.error?.message ||
           (error.status === 401 ? 'Invalid email or password' : 'Login failed');
 
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Login Failed',
-          detail: message
-        });
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Login Failed',
+            detail: message
+          });
+        }, 2000);
+        
       },
       complete: () => {
-        // redirecionar para Home após login bem-sucedido
-        this.router.navigate(['/home']);
+        setTimeout(() => {
+          this.isLoading = false;
+          // redirecionar para Home após login bem-sucedido
+          this.router.navigate(['/home']); 
+        }, 2000);
       }
-
     });
 
     // console.log('Form submitted payload', payload);

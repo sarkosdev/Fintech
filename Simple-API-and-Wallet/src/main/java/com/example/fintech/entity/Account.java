@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 /**
@@ -21,7 +22,7 @@ public class Account {
     private Long id;
 
     @NotNull
-    @Positive(message = "Field 'balance' in Account cannot be NEGATIVE")
+    @PositiveOrZero(message = "Field 'balance' in Account cannot be NEGATIVE")
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
 
