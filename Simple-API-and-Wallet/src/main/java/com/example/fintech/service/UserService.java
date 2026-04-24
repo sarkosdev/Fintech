@@ -32,7 +32,7 @@ public class UserService {
     private static final Logger logger = LogManager.getLogger(UserService.class);
     private final UserRepository userRepository;
     private final OutboxRepository outboxRepository;
-    private final PasswordEncoder passwordEncoder;                                          //Encodes password
+    private final PasswordEncoder passwordEncoder;                           //Encodes password
     private final RequestEventProducer requestEventProducer;
 
 

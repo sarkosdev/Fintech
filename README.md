@@ -598,7 +598,6 @@ This demonstrates the implementation of **message-driven architecture** inside t
 Planned improvements include:
 
 - API documentation with Swagger/OpenAPI
-- Dockerized deployment
 - Monitoring and logging tools
 - CI/CD pipeline
 
